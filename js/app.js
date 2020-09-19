@@ -16,6 +16,10 @@ class TicTacToe {
 			[0, 3, 6],
 			[2, 5, 8],
 		];
+		this.diagonals = [
+			[0, 4, 8],
+			[2, 4, 6],
+		];
 		this.buttonsChecked = [false, false, false, false, false, false, false, false, false];
 		this.corners = [0, 2, 6, 8];
 		this.centerOfLine = [1, 3, 5, 7];
@@ -97,8 +101,41 @@ class TicTacToe {
 			this.firstMove();
 			this.verifyChecked();
 		} else {
-			this.lastsMoves();
-			this.verifyChecked();
+			if (this.player == 3) {
+				if (this.optionsSelectedPlayer2[0] == 4) {
+					this.lastsMoves();
+					this.verifyChecked();
+				} else {
+					const leftoverCorners = this.corners.filter((corner) => {
+						if (!this.buttonsChecked[corner]) {
+							return true;
+						} else {
+							return false;
+						}
+					});
+					const randomNumber = Math.random();
+					this.diagonals.forEach((diagonal) => {
+						let counter = 0;
+						diagonal.forEach((singleNumber) => {
+							if (this.buttonsChecked[singleNumber]) {
+								counter++;
+							}
+						});
+						if (counter == 3) {
+							for (let i = 0; i < leftoverCorners.length; i++) {
+								if (randomNumber <= (1 / leftoverCorners.length) * (i + 1)) {
+									this.selected(leftoverCorners[i]);
+									break;
+								}
+							}
+						}
+					});
+				}
+				console.log(this.player);
+			} else {
+				this.lastsMoves();
+				this.verifyChecked();
+			}
 		}
 	}
 
@@ -162,6 +199,8 @@ class TicTacToe {
 		});
 		return remainingOptions;
 	}
+
+	thirdMove() {}
 
 	lastsMoves() {
 		let moveToWin = undefined;
