@@ -40,7 +40,8 @@ class TicTacToe {
 		this.optionsSelectedPlayer1 = [];
 		this.optionsSelectedPlayer2 = [];
 		this.player = 0;
-		this.selectedFunction = (e) => {
+		this.selectedFunction = (event) => {
+			const e = event;
 			this.verifyChecked();
 			if (this.singlePlayer) {
 				if (this.player % 2 == 0) {
@@ -72,6 +73,7 @@ class TicTacToe {
 	}
 
 	checkIfWin() {
+		const winZone = document.querySelector("#optionsWrapper > h5");
 		this.optionsToWin.forEach((singleOption) => {
 			let counterP1 = 0;
 			let counterP2 = 0;
@@ -80,7 +82,7 @@ class TicTacToe {
 					if (optionNumber == option) {
 						counterP1++;
 						if (counterP1 == 3) {
-							alert("Player 1 win");
+							winZone.innerText = "Player 1 win";
 						}
 					}
 				});
@@ -88,7 +90,7 @@ class TicTacToe {
 					if (optionNumber == option) {
 						counterP2++;
 						if (counterP2 == 3) {
-							alert("Player 2 win");
+							winZone.innerText = "Player 2 win";
 						}
 					}
 				});
@@ -97,6 +99,7 @@ class TicTacToe {
 	}
 
 	automaticMove() {
+		this.verifyChecked();
 		if (this.player == 1) {
 			this.firstMove();
 			this.verifyChecked();
@@ -114,6 +117,7 @@ class TicTacToe {
 						}
 					});
 					const randomNumber = Math.random();
+					let possibleSolutions = false;
 					this.diagonals.forEach((diagonal) => {
 						let counter = 0;
 						diagonal.forEach((singleNumber) => {
@@ -122,14 +126,21 @@ class TicTacToe {
 							}
 						});
 						if (counter == 3) {
-							for (let i = 0; i < leftoverCorners.length; i++) {
-								if (randomNumber <= (1 / leftoverCorners.length) * (i + 1)) {
-									this.selected(leftoverCorners[i]);
-									break;
-								}
-							}
+							possibleSolutions = true;
+							console.log(possibleSolutions);
 						}
 					});
+					if (possibleSolutions) {
+						for (let i = 0; i < leftoverCorners.length; i++) {
+							if (randomNumber <= (1 / leftoverCorners.length) * (i + 1)) {
+								this.selected(leftoverCorners[i]);
+								break;
+							}
+						}
+					} else {
+						this.lastsMoves();
+						this.verifyChecked();
+					}
 				}
 				console.log(this.player);
 			} else {
@@ -199,8 +210,6 @@ class TicTacToe {
 		});
 		return remainingOptions;
 	}
-
-	thirdMove() {}
 
 	lastsMoves() {
 		let moveToWin = undefined;
@@ -365,4 +374,36 @@ class TicTacToe {
 	}
 }
 
-const tictactoe = new TicTacToe();
+class Restart {
+	constructor() {
+		const restart = document.querySelector("#optionsWrapper > .clear");
+		restart.addEventListener("click", this.restartEvent);
+	}
+	restartEvent() {
+		tictactoe.buttons.forEach((button) => {
+			button.innerText = "";
+		});
+		tictactoe = undefined;
+		tictactoe = new TicTacToe();
+	}
+}
+
+class SinglePlayer {
+	constructor() {
+		const singlePlayer = document.querySelector("#optionsWrapper > .playAlone");
+		singlePlayer.addEventListener("click", () => {
+			restart.restartEvent();
+			tictactoe.singlePlayer = !tictactoe.singlePlayer;
+			console.log(tictactoe.singlePlayer);
+			if (singlePlayer.innerText == "Play Alone") {
+				singlePlayer.innerText = "Play with a friend";
+			} else {
+				singlePlayer.innerText = "Play Alone";
+			}
+		});
+	}
+}
+
+var tictactoe = new TicTacToe();
+const restart = new Restart();
+const singlePlayer = new SinglePlayer();
