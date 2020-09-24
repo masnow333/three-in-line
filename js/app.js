@@ -24,6 +24,8 @@ class TicTacToe {
 		this.corners = [0, 2, 6, 8];
 		this.centerOfLine = [1, 3, 5, 7];
 		this.singlePlayer = true;
+		this.optionsSelectedPlayer1 = [];
+		this.optionsSelectedPlayer2 = [];
 		this.addButtonEvent();
 	}
 
@@ -31,71 +33,88 @@ class TicTacToe {
 		for (let i = 0; i < this.buttonsChecked.length; i++) {
 			if (this.buttons[i].innerText != "") {
 				this.buttonsChecked[i] = true;
+			} else {
+				this.buttonsChecked[i] = false;
 			}
 		}
 	}
 
 	addButtonEvent() {
 		this.buttons = document.querySelectorAll("#buttonWrapper > button");
-		this.optionsSelectedPlayer1 = [];
-		this.optionsSelectedPlayer2 = [];
 		this.player = 0;
-		this.selectedFunction = (event) => {
-			const e = event;
-			this.verifyChecked();
-			if (this.singlePlayer) {
-				if (this.player % 2 == 0) {
-					e.target.innerText = "x";
-					this.optionsSelectedPlayer1.push(parseInt(e.target.value));
-					e.target.removeEventListener("click", this.selectedFunction);
-				} else {
-					this.automaticMove();
-				}
-			} else {
-				if (this.player % 2 == 0) {
-					e.target.innerText = "X";
-					this.optionsSelectedPlayer1.push(parseInt(e.target.value));
-				} else {
-					e.target.innerText = "O";
-					this.optionsSelectedPlayer2.push(parseInt(e.target.value));
-				}
-				e.target.removeEventListener("click", this.selectedFunction);
-			}
-			this.player++;
-			if (this.player % 2 == 1) {
-				this.selectedFunction();
-			}
-			this.checkIfWin();
-		};
 		this.buttons.forEach((button) => {
 			button.addEventListener("click", this.selectedFunction);
 		});
 	}
 
+	selectedFunction = (event) => {
+		const e = event;
+		if (this.singlePlayer) {
+			if (this.player % 2 == 0) {
+				e.target.innerText = "x";
+				this.optionsSelectedPlayer1.push(parseInt(e.target.value));
+				e.target.removeEventListener("click", this.selectedFunction);
+			} else {
+				this.automaticMove();
+			}
+		} else {
+			if (this.player % 2 == 0) {
+				e.target.innerText = "X";
+				this.optionsSelectedPlayer1.push(parseInt(e.target.value));
+			} else {
+				e.target.innerText = "O";
+				this.optionsSelectedPlayer2.push(parseInt(e.target.value));
+			}
+			e.target.removeEventListener("click", this.selectedFunction);
+		}
+		this.player++;
+		if (this.player % 2 == 1) {
+			this.selectedFunction();
+		}
+		this.checkIfWin();
+	};
+
 	checkIfWin() {
 		const winZone = document.querySelector("#optionsWrapper > h5");
-		this.optionsToWin.forEach((singleOption) => {
+		for (let iterator = 0; iterator < this.optionsToWin.length; iterator++) {
+			const singleOption = this.optionsToWin[iterator];
 			let counterP1 = 0;
 			let counterP2 = 0;
-			singleOption.forEach((optionNumber) => {
-				this.optionsSelectedPlayer1.forEach((option) => {
-					if (optionNumber == option) {
+			let breakLoop = false;
+			for (let index = 0; index < singleOption.length; index++) {
+				const optionNumber = singleOption[index];
+				for (let i = 0; i < this.optionsSelectedPlayer1.length; i++) {
+					if (optionNumber == this.optionsSelectedPlayer1[i]) {
 						counterP1++;
-						if (counterP1 == 3) {
-							winZone.innerText = "Player 1 win";
-						}
 					}
-				});
-				this.optionsSelectedPlayer2.forEach((option) => {
-					if (optionNumber == option) {
+					if (counterP1 == 3) {
+						winZone.innerText = "Player 1 win";
+						breakLoop = true;
+					}
+					if (breakLoop) {
+						break;
+					}
+				}
+				for (let i = 0; i < this.optionsSelectedPlayer2.length; i++) {
+					if (optionNumber == this.optionsSelectedPlayer2[i]) {
 						counterP2++;
-						if (counterP2 == 3) {
-							winZone.innerText = "Player 2 win";
-						}
 					}
-				});
-			});
-		});
+					if (counterP2 == 3) {
+						winZone.innerText = "Player 2 win";
+						breakLoop = true;
+					}
+					if (breakLoop) {
+						break;
+					}
+				}
+				if (breakLoop) {
+					break;
+				}
+			}
+			if (breakLoop) {
+				break;
+			}
+		}
 	}
 
 	automaticMove() {
@@ -105,44 +124,46 @@ class TicTacToe {
 			this.verifyChecked();
 		} else {
 			if (this.player == 3) {
-				if (this.optionsSelectedPlayer2[0] == 4) {
-					this.lastsMoves();
-					this.verifyChecked();
+				this.thirdMove();
+			} else {
+				this.lastsMoves();
+				this.verifyChecked();
+			}
+		}
+	}
+
+	thirdMove() {
+		if (this.optionsSelectedPlayer2[0] == 4) {
+			this.lastsMoves();
+			this.verifyChecked();
+		} else {
+			const leftoverCorners = this.corners.filter((corner) => {
+				if (!this.buttonsChecked[corner]) {
+					return true;
 				} else {
-					const leftoverCorners = this.corners.filter((corner) => {
-						if (!this.buttonsChecked[corner]) {
-							return true;
-						} else {
-							return false;
-						}
-					});
-					const randomNumber = Math.random();
-					let possibleSolutions = false;
-					this.diagonals.forEach((diagonal) => {
-						let counter = 0;
-						diagonal.forEach((singleNumber) => {
-							if (this.buttonsChecked[singleNumber]) {
-								counter++;
-							}
-						});
-						if (counter == 3) {
-							possibleSolutions = true;
-							console.log(possibleSolutions);
-						}
-					});
-					if (possibleSolutions) {
-						for (let i = 0; i < leftoverCorners.length; i++) {
-							if (randomNumber <= (1 / leftoverCorners.length) * (i + 1)) {
-								this.selected(leftoverCorners[i]);
-								break;
-							}
-						}
-					} else {
-						this.lastsMoves();
-						this.verifyChecked();
+					return false;
+				}
+			});
+			const randomNumber = Math.random();
+			let possibleSolutions = false;
+			this.diagonals.forEach((diagonal) => {
+				let counter = 0;
+				diagonal.forEach((singleNumber) => {
+					if (this.buttonsChecked[singleNumber]) {
+						counter++;
+					}
+				});
+				if (counter == 3) {
+					possibleSolutions = true;
+				}
+			});
+			if (possibleSolutions) {
+				for (let i = 0; i < leftoverCorners.length; i++) {
+					if (randomNumber <= (1 / leftoverCorners.length) * (i + 1)) {
+						this.selected(leftoverCorners[i]);
+						break;
 					}
 				}
-				console.log(this.player);
 			} else {
 				this.lastsMoves();
 				this.verifyChecked();
@@ -213,61 +234,65 @@ class TicTacToe {
 
 	lastsMoves() {
 		let moveToWin = undefined;
-		this.optionsToWin.forEach((singleOption) => {
+		this.optionsToWin.forEach((SingleOption) => {
 			let counter = 0;
-			singleOption.forEach((singleNumber) => {
+			SingleOption.forEach((singleNumber) => {
 				this.optionsSelectedPlayer2.forEach((selectedNumber) => {
 					if (singleNumber == selectedNumber) {
 						counter++;
 					}
 				});
 			});
+			console.log(this.optionsSelectedPlayer2);
 			if (counter >= 2) {
-				singleOption.forEach((singleNumber) => {
+				SingleOption.forEach((singleNumber) => {
 					if (!this.buttonsChecked[singleNumber]) {
 						moveToWin = singleNumber;
 					}
 				});
 			}
 		});
-
+		console.log(moveToWin);
 		if (moveToWin != undefined) {
 			this.selected(moveToWin);
 		} else {
-			this.case = false;
-			principalLoop: for (let i = 0; i < this.optionsToWin.length; i++) {
-				this.lastsMoves.singleOption = this.optionsToWin[i];
-				this.lastsMoves.counterP1 = 0;
-				this.possibilitiesP1 = [];
-				for (let i = 0; i < this.lastsMoves.singleOption.length; i++) {
-					this.lastsMoves.singleNumber = this.lastsMoves.singleOption[i];
+			let singleOption;
+			let possibilities;
+			let thisCase = false;
+			for (let i = 0; i < this.optionsToWin.length; i++) {
+				singleOption = this.optionsToWin[i];
+				possibilities = [];
+				let counter = 0;
+				for (let i = 0; i < singleOption.length; i++) {
+					let singleNumber = singleOption[i];
 					for (let i = 0; i < this.optionsSelectedPlayer1.length; i++) {
-						this.lastsMoves.selectedNumber = this.optionsSelectedPlayer1[i];
-						if (this.lastsMoves.singleNumber == this.lastsMoves.selectedNumber) {
-							switch (this.lastsMoves.singleOption.indexOf(this.lastsMoves.selectedNumber)) {
+						let selectedNumber = this.optionsSelectedPlayer1[i];
+						console.log(singleNumber, "singleNumber", selectedNumber, "selectedNumber");
+						if (singleNumber == selectedNumber) {
+							console.log("entró");
+							switch (singleOption.indexOf(selectedNumber)) {
 								case 0:
-									this.possibilitiesP1.push(0);
+									possibilities.push(0);
 									break;
 								case 1:
-									this.possibilitiesP1.push(1);
+									possibilities.push(1);
 									break;
 								case 2:
-									this.possibilitiesP1.push(2);
+									possibilities.push(2);
 									break;
 
 								default:
 									break;
 							}
-							this.lastsMoves.counterP1++;
-							if (this.lastsMoves.counterP1 == 2) {
-								for (let i = 0; i < 3; i++) {
-									if (!this.possibilitiesP1.includes(i)) {
-										if (!this.buttonsChecked[this.lastsMoves.singleOption[i]]) {
-											this.case = true;
-											this.position = this.lastsMoves.singleOption[i];
-											this.selected(this.position);
-											console.log(this.buttons[this.position], "perro");
-										}
+							counter++;
+							console.log(counter);
+						}
+						if (counter == 2) {
+							for (let i = 0; i < 3; i++) {
+								if (!possibilities.includes(i)) {
+									if (!this.buttonsChecked[singleOption[i]]) {
+										thisCase = true;
+										this.selected(singleOption[i]);
 									}
 								}
 							}
@@ -275,7 +300,7 @@ class TicTacToe {
 					}
 				}
 			}
-			if (!this.case) {
+			if (!thisCase) {
 				const possibilities = [];
 				const freeOptions = [];
 				this.optionsToWin.forEach((option) => {
@@ -360,14 +385,10 @@ class TicTacToe {
 								console.log("There are an error");
 							}
 						}
-						console.log(remainingOptions);
 					} else {
 						this.selected(position);
 					}
 					const remainingOptions = this.remainingOptions();
-					console.log(remainingOptions, "loro");
-					console.log(lateral, "perro");
-					console.log(position, "Gato");
 				}
 			}
 		}
@@ -376,15 +397,21 @@ class TicTacToe {
 
 class Restart {
 	constructor() {
+		let winZone = document.querySelector("#optionsWrapper > h5");
 		const restart = document.querySelector("#optionsWrapper > .clear");
-		restart.addEventListener("click", this.restartEvent);
+		restart.addEventListener("click", () => this.restartEvent(winZone));
 	}
 	restartEvent() {
+		let winZone = document.querySelector("#optionsWrapper > h5");
+		tictactoe.addButtonEvent();
+		tictactoe.optionsSelectedPlayer1 = [];
+		tictactoe.optionsSelectedPlayer2 = [];
+		tictactoe.player = 0;
+		winZone.innerText = "";
 		tictactoe.buttons.forEach((button) => {
 			button.innerText = "";
 		});
-		tictactoe = undefined;
-		tictactoe = new TicTacToe();
+		console.log("restar Finished");
 	}
 }
 
@@ -394,11 +421,10 @@ class SinglePlayer {
 		singlePlayer.addEventListener("click", () => {
 			restart.restartEvent();
 			tictactoe.singlePlayer = !tictactoe.singlePlayer;
-			console.log(tictactoe.singlePlayer);
-			if (singlePlayer.innerText == "Play Alone") {
-				singlePlayer.innerText = "Play with a friend";
-			} else {
+			if (singlePlayer.innerText == "Play with a friend") {
 				singlePlayer.innerText = "Play Alone";
+			} else {
+				singlePlayer.innerText = "Play with a friend";
 			}
 		});
 	}

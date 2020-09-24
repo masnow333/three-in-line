@@ -78,4 +78,55 @@ body main section#buttonWrapper button:hover {
   background: #c9c6c6;
 }
 
+@media screen and (max-width: 1000px) {
+  body main header h1 {
+    font-size: 2rem;
+  }
+}
+@media screen and (max-width: 700px) {
+  body {
+    background-image: url(https://cdn.pixabay.com/photo/2017/02/24/17/16/paper-2095674_960_720.jpg);
+  }
+  body main header {
+    padding: 0;
+    justify-self: center;
+    grid-column: 1/3;
+    grid-row: 1/2;
+  }
+}
+@media screen and (max-width: 600px) {
+  body main {
+    grid-template-rows: none;
+    justify-items: center;
+  }
+  body main header h1 {
+    font-size: 1.5rem;
+  }
+  body main section#buttonWrapper {
+    grid-column: 1/3;
+    grid-row: 2/3;
+    align-self: start;
+  }
+  body main section#optionsWrapper {
+    height: 100%;
+    grid-template-rows: auto;
+    grid-row: 3/4;
+    grid-column: 1/3;
+    align-content: start;
+    justify-items: center;
+    width: 100%;
+    gap: 1rem;
+  }
+  body main section#optionsWrapper h5 {
+    margin: 0;
+    transition: all 2s linear;
+    font-size: large;
+  }
+}
+@media screen and (max-width: 400px) {
+  body {
+    background-image: url(https://cdn.pixabay.com/photo/2016/12/28/01/44/leaf-notebook-1935230_960_720.jpg);
+  }
+}
+
 /*# sourceMappingURL=styles.css.map */
