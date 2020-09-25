@@ -47,9 +47,10 @@ class TicTacToe {
 		});
 	}
 
-	selectedFunction = (event) => {
-		const e = event;
+	selectedFunction = (even) => {
+		const e = even;
 		if (this.singlePlayer) {
+			console.log(this.player);
 			if (this.player % 2 == 0) {
 				e.target.innerText = "x";
 				this.optionsSelectedPlayer1.push(parseInt(e.target.value));
@@ -58,6 +59,7 @@ class TicTacToe {
 				this.automaticMove();
 			}
 		} else {
+			console.log("else");
 			if (this.player % 2 == 0) {
 				e.target.innerText = "X";
 				this.optionsSelectedPlayer1.push(parseInt(e.target.value));
@@ -68,8 +70,10 @@ class TicTacToe {
 			e.target.removeEventListener("click", this.selectedFunction);
 		}
 		this.player++;
-		if (this.player % 2 == 1) {
-			this.selectedFunction();
+		if (this.singlePlayer) {
+			if (this.player % 2 == 1) {
+				this.selectedFunction(e);
+			}
 		}
 		this.checkIfWin();
 	};
@@ -243,7 +247,6 @@ class TicTacToe {
 					}
 				});
 			});
-			console.log(this.optionsSelectedPlayer2);
 			if (counter >= 2) {
 				SingleOption.forEach((singleNumber) => {
 					if (!this.buttonsChecked[singleNumber]) {
@@ -252,7 +255,6 @@ class TicTacToe {
 				});
 			}
 		});
-		console.log(moveToWin);
 		if (moveToWin != undefined) {
 			this.selected(moveToWin);
 		} else {
@@ -267,9 +269,7 @@ class TicTacToe {
 					let singleNumber = singleOption[i];
 					for (let i = 0; i < this.optionsSelectedPlayer1.length; i++) {
 						let selectedNumber = this.optionsSelectedPlayer1[i];
-						console.log(singleNumber, "singleNumber", selectedNumber, "selectedNumber");
 						if (singleNumber == selectedNumber) {
-							console.log("entró");
 							switch (singleOption.indexOf(selectedNumber)) {
 								case 0:
 									possibilities.push(0);
@@ -285,7 +285,6 @@ class TicTacToe {
 									break;
 							}
 							counter++;
-							console.log(counter);
 						}
 						if (counter == 2) {
 							for (let i = 0; i < 3; i++) {
@@ -397,9 +396,8 @@ class TicTacToe {
 
 class Restart {
 	constructor() {
-		let winZone = document.querySelector("#optionsWrapper > h5");
 		const restart = document.querySelector("#optionsWrapper > .clear");
-		restart.addEventListener("click", () => this.restartEvent(winZone));
+		restart.addEventListener("click", this.restartEvent);
 	}
 	restartEvent() {
 		let winZone = document.querySelector("#optionsWrapper > h5");
@@ -411,7 +409,6 @@ class Restart {
 		tictactoe.buttons.forEach((button) => {
 			button.innerText = "";
 		});
-		console.log("restar Finished");
 	}
 }
 
